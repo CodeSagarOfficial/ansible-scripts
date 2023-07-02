@@ -2,7 +2,6 @@
 - name: Install Jenkins on Ubuntu Server
   hosts: ubuntu-server
   become: true
-  
   tasks:
     - name: Update apt cache
       apt:
@@ -47,3 +46,9 @@
         name: jenkins
         state: started
         enabled: yes
+
+    - name: Retrieve initialAdminPassword file
+      fetch:
+        src: /var/lib/jenkins/secrets/initialAdminPassword
+        dest: "{{ playbook_dir }}/initialAdminPassword"
+        flat: yes
