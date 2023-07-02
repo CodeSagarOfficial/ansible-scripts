@@ -1,0 +1,22 @@
+---
+- name: Install Docker on Ubuntu Server
+  hosts: ubuntu-server
+  become: true
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker dependencies
+      apt:
+        name:
+          - docker.io
+          - python3-pip
+        state: present
+
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+        state: present
+        executable: pip3

@@ -1,0 +1,82 @@
+---
+- name: Install Mysql5.7 in docker on EC2 Ubuntu
+  hosts: ubuntu-server
+  become: true
+  vars:
+      mysql_root_password: your_root_password
+      mysql_database: your_dataabse_name
+      mysql_user: your_user
+      mysql_password: your_password
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Install Docker dependencies
+      apt:
+        name:
+          - docker.io
+          - python3-pip
+        state: present
+
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+        state: present
+        executable: pip3
+
+    - name: Start MySQL container
+      docker_container:
+        name: mysql_5.7
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: "{{ mysql_root_password }}"
+          MYSQL_DATABASE: "{{ mysql_database }}"
+          MYSQL_USER: "{{ mysql_user }}"
+          MYSQL_PASSWORD: "{{ mysql_password }}"
+        ports:
+          - "3306:3306"
+        restart_policy: always
+        state: started
+
+    - name: Wait for MySQL to start
+      wait_for:
+        host: 127.0.0.1
+        port: 3306
+        state: started
+        delay: 5
+        timeout: 60
+
+    - name: Secure MySQL installation
+      shell: |
+        docker exec -i mysql_5.7 mysql -uroot -p{{ mysql_root_password }} -e "DELETE FROM mysql.user WHERE User='';"
+        docker exec -i mysql_5.7 mysql -uroot -p{{ mysql_root_password }} -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+        docker exec -i mysql_5.7 mysql -uroot -p{{ mysql_root_password }} -e "DROP DATABASE IF EXISTS test;"
+        docker exec -i mysql_5.7 mysql -uroot -p{{ mysql_root_password }} -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+        docker exec -i mysql_5.7 mysql -uroot -p{{ mysql_root_password }} -e "FLUSH PRIVILEGES;"
+      args:
+        executable: /bin/bash
+
+    - name: Copy MySQL custom configuration file to EC2 instance
+      copy:
+        src: "{{ playbook_dir }}/mysql.cnf"
+        dest: "/tmp/mysql.cnf"
+      
+    #   # Replace `/path/to/your/key.pem` with the actual path to your SSH private key
+    # - name: Copy MySQL custom configuration file from EC2 instance to Docker container
+    #   shell: ssh -i /Users/jaspreet/Documents/Course/devOps/install-mysql5.7-ansible-script/codekey ubuntu@{{ ansible_host }} "docker cp /tmp/mysql.cnf mysql_5.7:/etc/mysql/conf.d/mysql.cnf"
+    #   delegate_to: localhost
+    #   become: false
+
+    - name: Grant remote access to admin user
+      shell: |
+        docker exec -i mysql_5.7 mysql -uroot -p{{ mysql_root_password }} -e "GRANT ALL PRIVILEGES ON *.* TO '{{ mysql_user }}'@'%' IDENTIFIED BY '{{ mysql_password }}';"
+        docker exec -i mysql_5.7 mysql -uroot -p{{ mysql_root_password }} -e "FLUSH PRIVILEGES;"
+      args:
+        executable: /bin/bash
+      notify: Restart MySQL container
+
+  handlers:
+    - name: Restart MySQL container
+      command: docker restart mysql_5.7

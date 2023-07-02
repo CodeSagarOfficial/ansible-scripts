@@ -1,0 +1,40 @@
+---
+- name: Install Jenkins Using Docker on Ubuntu Server
+  hosts: ubuntu-server
+  become: true
+
+  vars:
+    jenkins_volumes:
+      - jenkins_home:/var/jenkins_home
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker dependencies
+      apt:
+        name:
+          - docker.io
+          - python3-pip
+        state: present
+
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+        state: present
+        executable: pip3
+
+    - name: Pull Jenkins Docker image
+      docker_image:
+        name: jenkins/jenkins:lts
+        source: pull
+
+    - name: Create Jenkins container
+      docker_container:
+        name: jenkins
+        image: jenkins/jenkins:lts
+        ports:
+          - "8080:8080"
+        volumes: "{{ jenkins_volumes }}"
+        restart_policy: always
