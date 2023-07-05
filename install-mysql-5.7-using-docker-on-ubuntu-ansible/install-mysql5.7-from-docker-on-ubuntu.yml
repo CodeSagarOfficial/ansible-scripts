@@ -1,6 +1,6 @@
 ---
 - name: Install Mysql5.7 in docker on EC2 Ubuntu
-  hosts: ubuntu-server
+  hosts: ubuntu_servers
   become: true
   vars:
       mysql_root_password: your_root_password

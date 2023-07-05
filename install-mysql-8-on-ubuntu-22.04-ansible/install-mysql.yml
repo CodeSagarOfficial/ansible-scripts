@@ -1,0 +1,89 @@
+---
+- name: setup Mysql with demo_db db and remote login
+  hosts: ubuntu_servers
+  become: yes
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Installing Mysql
+      package:
+         name: "{{item}}"
+         state: present
+         update_cache: yes
+      loop:
+        - mysql-server
+        - mysql-client
+        - python3-mysqldb
+        - libmysqlclient-dev
+      become: yes
+       
+    - name: start and enable mysql service
+      service:
+         name: mysql
+         state: started
+         enabled: yes
+
+    - name: Set root user password
+      mysql_user:
+        name: root
+        password: "{{root_password}}"
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+        host: localhost
+        login_user: root
+        login_password: ''
+        state: present
+
+    - name: Create admin user with remote access
+      mysql_user:
+        name: "{{admin_user}}"
+        password: "{{admin_password}}"
+        priv: '*.*:ALL'
+        host: '%'
+        append_privs: yes
+        login_user: root
+        login_password: "{{root_password}}"
+        state: present
+    
+    - name: creating database 
+      mysql_db:
+        name: "{{db_name}}"
+        state: present
+        login_user: root
+        login_password: "{{root_password}}"
+    
+    - name: Enable remote login to mysql
+      lineinfile:
+        path: /etc/mysql/mysql.conf.d/mysqld.cnf
+        regex: '^bind-address\s*=\s*127.0.0.1'
+        line: 'bind-address = 0.0.0.0'
+        backup: yes
+      notify:
+        - Restart mysql
+
+    - name: Execute MySQL secure installation
+      expect:
+        command: mysql_secure_installation
+        responses:
+          'Enter password for user root:': "{{ root_password }}"
+          'Press y\|Y for Yes, any other key for No': 'Y'
+          'Please enter 0 = LOW, 1 = MEDIUM and 2 = STRONG': "{{ password_validation_policy }}"
+          'Change the password for root \? \(\(Press y\|Y for Yes, any other key for No\)': 'n'
+          'Remove anonymous users\? \(Press y\|Y for Yes, any other key for No\)': 'Y'
+          'Disallow root login remotely\? \(Press y\|Y for Yes, any other key for No\)': 'Y'
+          'Remove test database and access to it\? \(Press y\|Y for Yes, any other key for No\)': 'Y'
+          'Reload privilege tables now\? \(Press y\|Y for Yes, any other key for No\)': 'Y'
+      environment:
+        MYSQL_PWD: "{{ root_password }}"
+
+
+  handlers:
+    - name: Restart mysql
+      service:
+        name: mysql
+        state: restarted

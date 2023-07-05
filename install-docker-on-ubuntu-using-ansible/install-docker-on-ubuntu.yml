@@ -1,6 +1,6 @@
 ---
 - name: Install Docker on Ubuntu Server
-  hosts: ubuntu-server
+  hosts: ubuntu_servers
   become: true
 
   tasks:

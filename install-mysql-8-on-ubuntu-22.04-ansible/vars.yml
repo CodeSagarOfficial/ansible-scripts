@@ -1,0 +1,10 @@
+---
+root_password: your_root_password
+admin_user: your_admin_user
+admin_password: your_admin_password
+db_name: database_name
+password_validation_policy: 1     
+
+# 0 - Low
+# 1 - Medium
+# 2 - Strong
