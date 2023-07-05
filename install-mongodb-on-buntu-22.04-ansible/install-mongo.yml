@@ -1,9 +1,10 @@
 ---
-- name: Install MongoDB
+- name: Install MongoDB on Ubuntu 22.04
   hosts: ubuntu_servers
   become: true
-  vars:
-    mongodb_version: "6.0"
+
+  vars_files:
+    - vars.yml
 
   tasks:
     - name: Update apt cache

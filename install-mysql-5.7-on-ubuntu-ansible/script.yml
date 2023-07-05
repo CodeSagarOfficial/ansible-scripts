@@ -1,0 +1,49 @@
+---
+- name: Install Mysql 5.7 on Ubuntu System
+  hosts: ubuntu_servers
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install MySQL packages
+      apt:
+        name:
+          - mysql-server
+          - mysql-client
+        state: present
+
+    - name: Configure MySQL root password
+      debconf:
+        name: mysql-server
+        question: 'mysql-server/root_password'
+        value: "{{ mysql_root_password }}"
+        vtype: password
+
+    - name: Confirm MySQL root password
+      debconf:
+        name: mysql-server
+        question: 'mysql-server/root_password_again'
+        value: "{{ mysql_root_password }}"
+        vtype: password
+
+    - name: Restart MySQL service
+      service:
+        name: mysql
+        state: restarted
+          
+    - name: Secure MySQL installation
+      become: true
+      command:
+        shell: |
+          mysql -u root -e "DELETE FROM mysql.user WHERE User='';"
+          mysql -u root -e "DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');"
+          mysql -u root -e "DROP DATABASE IF EXISTS test;"
+          mysql -u root -e "DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';"
+          mysql -u root -e "FLUSH PRIVILEGES;"
+        executable: /bin/bash

@@ -4,17 +4,18 @@ This repository contains ansible scripts.
 ## Links:
 
 ### Ubuntu Operating Syatem
-[Install Docker on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/blob/main/install-docker-in-ubuntu.yml)
+[Install Docker on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/tree/main/install-docker-on-ubuntu-using-ansible)
 
-[Install MySql 8.0 on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/blob/main/install-jenkins-in-ubuntu.yml)
+[Install MySql 8.0 on Ubuntu 22.04](https://github.com/CodeSagarOfficial/ansible-scripts/tree/main/install-mysql-8-on-ubuntu-22.04-ansible)
 
-[Install Jenkins on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/blob/main/install-jenkins-in-ubuntu.yml)
+[Install MongoDB 6.0 on Ubuntu 22.04](https://github.com/CodeSagarOfficial/ansible-scripts/tree/main/install-mongodb-6-on-buntu-22.04-ansible)
+
+[Install Jenkins on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/tree/main/install-jenkins-on-ubuntu-22.04-ansible)
 
 ### Using Docker Images:
-[Install Jenkins Using Docker on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/blob/main/install-jenkins-from-docker-in-ubuntu.yml)
+[Install Jenkins Using Docker on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/tree/main/install-jenkins-using-docker-on-ubuntu-ansible)
 
-[Install Mysql5.7 Using Docker on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/blob/main/install-mysql5.7-from-docker-in-ubuntu.yml)
-
+[Install Mysql5.7 Using Docker on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/tree/main/install-mysql-5.7-using-docker-on-ubuntu-ansible)
 
 ## Basic Commands
 ```hcl
