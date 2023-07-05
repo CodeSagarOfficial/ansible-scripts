@@ -1,5 +1,5 @@
 ---
-- name: Install & Secure Mysql 8 on Ubuntu
+- name: Install & Secure Mysql 5.7 on Ubuntu
   hosts: ubuntu_servers
   become: yes
 
@@ -11,28 +11,21 @@
       apt:
         update_cache: yes
 
-    - name: Installing Mysql
-      package:
-         name: "{{item}}"
-         state: present
-         update_cache: yes
-      loop:
-        - mysql-server
-        - mysql-client
-        - python3-mysqldb
-        - libmysqlclient-dev
-      become: yes
-       
-    - name: start and enable mysql service
+    - name: Install MySQL Server
+      apt:
+        name: mysql-server-5.7
+        state: present
+
+    - name: Start MySQL service
       service:
-         name: mysql
-         state: started
-         enabled: yes
+        name: mysql
+        state: started
+        enabled: yes
 
     - name: Set root user password
       mysql_user:
         name: root
-        password: "{{root_password}}"
+        password: "{{ root_password }}"
         login_unix_socket: /var/run/mysqld/mysqld.sock
         host: localhost
         login_user: root
@@ -41,30 +34,30 @@
 
     - name: Create admin user with remote access
       mysql_user:
-        name: "{{admin_user}}"
-        password: "{{admin_password}}"
+        name: "{{ admin_user }}"
+        password: "{{ admin_password }}"
         priv: '*.*:ALL'
         host: '%'
         append_privs: yes
         login_user: root
-        login_password: "{{root_password}}"
+        login_password: "{{ root_password }}"
         state: present
-    
-    - name: creating database 
+
+    - name: Create database
       mysql_db:
-        name: "{{db_name}}"
+        name: "{{ db_name }}"
         state: present
         login_user: root
-        login_password: "{{root_password}}"
-    
-    - name: Enable remote login to mysql
+        login_password: "{{ root_password }}"
+
+    - name: Enable remote login to MySQL
       lineinfile:
         path: /etc/mysql/mysql.conf.d/mysqld.cnf
         regex: '^bind-address\s*=\s*127.0.0.1'
         line: 'bind-address = 0.0.0.0'
         backup: yes
       notify:
-        - Restart mysql
+        - Restart MySQL
 
     - name: Execute MySQL secure installation
       expect:
@@ -82,7 +75,7 @@
         MYSQL_PWD: "{{ root_password }}"
 
   handlers:
-    - name: Restart mysql
+    - name: Restart MySQL
       service:
         name: mysql
         state: restarted

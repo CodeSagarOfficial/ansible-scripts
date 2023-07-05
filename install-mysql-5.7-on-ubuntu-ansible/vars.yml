@@ -1,9 +1,9 @@
 ---
-mysql_root_password: your_root_password
+root_password: your_root_password
 admin_user: your_admin_user
 admin_password: your_admin_password
-db_name: database_name
-password_validation_policy: 1     
+db_name: your_database_name
+password_validation_policy: 1
 
 # 0 - Low
 # 1 - Medium
