@@ -1,2 +1,12 @@
 ---
 mongodb_version: "6.0"
+database_name: "test_db"
+
+mongodb_root_user: "root"
+mongodb_root_password: "root1234"
+
+mongodb_admin_user: "superadmin"
+mongodb_admin_password: "superadmin123"
+
+mongodb_backup_user: "backupuser"
+mongodb_backup_password: "backupuser123"
