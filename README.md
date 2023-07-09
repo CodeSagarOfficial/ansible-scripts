@@ -12,6 +12,9 @@ This repository contains ansible scripts.
 
 [Install Jenkins on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/tree/main/install-jenkins-on-ubuntu-22.04-ansible)
 
+[Install Terraform on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/tree/main/Install-terraform-on-ubuntu-ansible)
+
+
 ### Using Docker Images:
 [Install Jenkins Using Docker on Ubuntu](https://github.com/CodeSagarOfficial/ansible-scripts/tree/main/install-jenkins-using-docker-on-ubuntu-ansible)
 
