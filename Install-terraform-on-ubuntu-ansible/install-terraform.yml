@@ -1,0 +1,34 @@
+---
+- name: Install Terraform
+  hosts: ubuntu_servers
+  become: true
+
+  tasks:
+    - name: Check if unzip is installed
+      stat:
+        path: /usr/bin/unzip
+      register: unzip_installed
+      failed_when: false
+
+    - name: Install unzip
+      package:
+        name: unzip
+        state: present
+      when: not unzip_installed.stat.exists
+
+    - name: Download Terraform binary
+      get_url:
+        url: "https://releases.hashicorp.com/terraform/1.5.2/terraform_1.5.2_linux_amd64.zip"
+        dest: "/tmp/terraform.zip"
+
+    - name: Unzip Terraform binary
+      unarchive:
+        src: "/tmp/terraform.zip"
+        dest: "/usr/local/bin"
+        remote_src: true
+        creates: "/usr/local/bin/terraform"
+
+    - name: Set executable permissions for Terraform
+      file:
+        path: "/usr/local/bin/terraform"
+        mode: "+x"
